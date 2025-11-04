@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - BitCake</title>
+
+    <link rel="shortcut icon" href="./assets/logo.png" type="image/x-icon">
+    
+    <link rel="shortcut icon" href="" type="image/x-icon">
+    <link rel="stylesheet" href="./styles/output.css" /> 
+    
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm border border-gray-200">
+        
+        <div class="text-center mb-6">
+            <img 
+                src="./assets/logo.png" 
+                alt="Logo BitCake"
+                class="w-20 h-20 rounded-full shadow-md mx-auto mb-3"
+            />
+            <h2 class="text-3xl font-bold text-zinc-900">Crie sua conta</h2>
+            <p class="text-sm text-gray-500">Rápido e fácil para começar a comprar!</p>
+        </div>
+
+        <form id="register-form"> 
+            
+            <div class="mb-4">
+                <label for="register-name" class="block text-sm font-medium text-gray-700 mb-1">
+                    <i class="fas fa-user-circle mr-1 text-gray-400"></i> Nome
+                </label>
+                <input 
+                    type="text" 
+                    id="register-name" 
+                    name="name" 
+                    placeholder="Seu nome completo"
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b96d5c] transition duration-150" 
+                    required
+                >
+            </div>
+
+            <div class="mb-4">
+                <label for="register-email" class="block text-sm font-medium text-gray-700 mb-1">
+                    <i class="fas fa-envelope mr-1 text-gray-400"></i> E-mail
+                </label>
+                <input 
+                    type="email" 
+                    id="register-email" 
+                    name="email" 
+                    placeholder="seu.email@exemplo.com"
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b96d5c] transition duration-150" 
+                    required
+                >
+            </div>
+            
+            <div class="mb-6">
+                <label for="register-password" class="block text-sm font-medium text-gray-700 mb-1">
+                    <i class="fas fa-lock mr-1 text-gray-400"></i> Senha
+                </label>
+                <input 
+                    type="password" 
+                    id="register-password" 
+                    name="password" 
+                    placeholder="Mínimo 6 caracteres"
+                    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b96d5c] transition duration-150" 
+                    required
+                >
+            </div>
+
+            <button 
+                type="submit" 
+                class="w-full bg-[#014926] text-white py-2 rounded-md font-bold text-lg hover:bg-green-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+            >
+                <i class="fas fa-user-plus mr-2"></i> Cadastrar
+            </button>
+        </form>
+
+        <p class="text-center text-sm mt-6 text-gray-600 border-t pt-4">
+            Já tem conta? 
+            <a href="login.html" class="text-[#b96d5c] font-medium hover:underline transition duration-150">Acesse aqui!</a>
+        </p>
+        
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js" defer></script>
+</body>
+</html>
