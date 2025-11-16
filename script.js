@@ -1,6 +1,7 @@
-
 const SUPABASE_URL = 'https://wvithsajytvhsazxmgaj.supabase.co'; 
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2aXRoc2FqeXR2aHNhenhtZ2FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNTQ1MTgsImV4cCI6MjA3NjczMDUxOH0.gIFxHbvUBfrrWffRSNjaW4CCtykqOQoeiL4l7WQpsjA'; 
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2aXRoc2FqeXR2aHNhenhtZ2FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNTQ1MTgsImV4cCI6MjA3NjczMDUxOH0.gIFxHbvUBfrrWffRSNjaW4CCtykqOQoeiL4l7WQpsjA';
+
+const ADMIN_EMAIL = 'admincake@gmail.com';
 
 let supabaseClient = null;
 if (typeof supabase !== 'undefined') {
@@ -85,14 +86,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     propagateRedirectParam();
-  
+
+    // ★★★ INÍCIO DA NOVA FUNÇÃO (OLHO MÁGICO) ★★★
+    function setupPasswordToggle(toggleButtonId, passwordInputId) {
+        const toggleButton = document.getElementById(toggleButtonId);
+        const passwordInput = document.getElementById(passwordInputId);
+        
+        if (!toggleButton || !passwordInput) {
+            // Se os elementos não existirem na página atual, não faz nada
+            return;
+        }
+
+        toggleButton.addEventListener('click', () => {
+            // Verifica o tipo atual do input
+            const isPassword = passwordInput.type === 'password';
+            
+            if (isPassword) {
+                // Se for senha, muda para texto
+                passwordInput.type = 'text';
+                // Muda o ícone para "olho cortado"
+                toggleButton.innerHTML = '<i class="fas fa-eye-slash"></i>'; 
+                toggleButton.setAttribute('aria-label', 'Esconder senha');
+            } else {
+                // Se for texto, muda para senha
+                passwordInput.type = 'password';
+                // Muda o ícone de volta para "olho"
+                toggleButton.innerHTML = '<i class="fas fa-eye"></i>'; 
+                toggleButton.setAttribute('aria-label', 'Mostrar senha');
+            }
+        });
+    }
+    // ★★★ FIM DA NOVA FUNÇÃO ★★★
+
+
+    // LÓGICA DE CADASTRO
     const registerForm = document.getElementById('register-form');
     if (registerForm && supabaseClient) {
+        
+        // ★★★ CHAMA A FUNÇÃO PARA A PÁGINA DE CADASTRO ★★★
+        setupPasswordToggle('toggle-register-password', 'register-password');
+
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('register-name').value;
             const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
+            // ★★★ CAPTURA O TELEFONE ★★★
+            const phone = document.getElementById('register-phone').value;
+
             const urlParams = new URLSearchParams(window.location.search);
             const redirectTo = urlParams.get('redirect'); 
             const loginUrl = redirectTo ? `login.html?redirect=${encodeURIComponent(redirectTo)}` : 'login.html'; 
@@ -106,8 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 2. Cria a entrada na tabela 'Perfis'
             if (authData.user) {
+                // ★★★ SALVA O TELEFONE NO PERFIL ★★★
                 const { error: profileError } = await supabaseClient.from('Perfis').insert([
-                    { id: authData.user.id, nome_usuario: name }
+                    { id: authData.user.id, nome_usuario: name, telefone: phone }
                 ]);
 
                 if (profileError) {
@@ -122,9 +164,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // LÓGICA DE LOGIN 
-
     const loginForm = document.getElementById('login-form');
     if (loginForm && supabaseClient) {
+
+        // ★★★ CHAMA A FUNÇÃO PARA A PÁGINA DE LOGIN ★★★
+        setupPasswordToggle('toggle-login-password', 'login-password');
+
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -145,7 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // LÓGICA DO CARRINHO 
-
     if (cartBtn && cartModal && closeModalBtn && menu && checkoutBtn && cartItemsContainer) {
         
         cartBtn.addEventListener("click", () => {
@@ -246,11 +290,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const profileNameEl = document.getElementById('profile-name');
         const profileAddressEl = document.getElementById('profile-address');
         const recentOrdersList = document.getElementById('recent-orders-list');
-        const viewAllOrdersBtn = document.getElementById('view-all-orders-btn');
+        const viewAllOrdersBtn = document.getElementById('view-all-orders-btn'); // Note: This ID is not in index.html, but code exists.
         const profileLogoutBtn = document.getElementById('profile-logout-btn');
 
         async function loadProfileData(user) {
             if (!user || !supabaseClient) return;
+
+            // MODIFICADO: LÓGICA DO LINK ADMIN ADICIONADA AQUI
+            const adminPanelLink = document.getElementById('admin-panel-link');
+            if (adminPanelLink) {
+                adminPanelLink.classList.toggle('hidden', user.email !== ADMIN_EMAIL);
+            }
+            // FIM DA LÓGICA DO LINK ADMIN
 
             const userId = user.id;
 
@@ -291,7 +342,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (ordersData && ordersData.length > 0) {
                     ordersData.forEach(pedido => {
                         const statusClass = pedido.status ? pedido.status.replace(/\s/g, '') : 'Recebido'; 
-                        const dataFormatada = new Date(pedido.data_pedido).toLocaleDateString('pt-BR', { dateStyle: 'short' });
+                        
+                        // ★★★ LINHA CORRIGIDA PARA EVITAR O CRASH ★★★
+                        const dataFormatada = new Date(pedido.data_pedido).toLocaleString('pt-BR');
 
                         const orderElement = document.createElement('div');
                         orderElement.classList.add('flex', 'justify-between', 'items-center', 'p-3', 'bg-white', 'rounded-lg', 'border', 'shadow-sm');
@@ -416,8 +469,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const summaryDelivery = document.getElementById('summary-delivery');
         const summaryTotal = document.getElementById('summary-total');
         const finalizeOrderBtn = document.getElementById('finalize-order-btn');
+        // ★★★ NOVOS ELEMENTOS DO VENDAS.HTML ★★★
+        const phoneInput = document.getElementById('phone-input');
+        const phoneWarn = document.getElementById('phone-warn');
         const addressInput = document.getElementById('address-input');
         const addressWarn = document.getElementById('address-warn');
+        // ★★★ FIM DA MODIFICAÇÃO ★★★
         const paymentOptionsElements = document.querySelectorAll('input[name="payment-method"]');
         const detailsCartao = document.getElementById('details-cartao');
         const detailsPix = document.getElementById('details-pix');
@@ -464,16 +521,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const userId = user.id;
 
-                // A. Busca Preferência de Pagamento
+                // A. Busca Preferência de Pagamento E TELEFONE
                 const { data: perfil } = await supabaseClient
                     .from('Perfis')
-                    .select('pref_pagamento')
+                    .select('pref_pagamento, telefone') // ★★★ BUSCA O TELEFONE ★★★
                     .eq('id', userId)
                     .single();
 
-                if (perfil && perfil.pref_pagamento) {
-                    const radio = document.querySelector(`input[name="payment-method"][value="${perfil.pref_pagamento}"]`);
-                    if (radio) radio.checked = true;
+                if (perfil) {
+                    if (perfil.pref_pagamento) {
+                        const radio = document.querySelector(`input[name="payment-method"][value="${perfil.pref_pagamento}"]`);
+                        if (radio) radio.checked = true;
+                    }
+                    // ★★★ POPULA O CAMPO DE TELEFONE ★★★
+                    if (perfil.telefone && phoneInput) {
+                        phoneInput.value = perfil.telefone;
+                    }
                 }
 
                 // B. Busca Endereço Padrão
@@ -542,15 +605,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Validações
                 const cartData = getCartFromStorage();
+                // ★★★ VALIDA O TELEFONE ★★★
+                const deliveryPhone = phoneInput ? phoneInput.value.trim() : '';
                 const deliveryAddress = addressInput ? addressInput.value.trim() : '';
                 const notes = document.getElementById('notes-input')?.value;
                 const selectedPaymentRadio = document.querySelector('input[name="payment-method"]:checked');
 
-                if (cartData.length === 0 || deliveryAddress === '' || !selectedPaymentRadio) {
+                if (cartData.length === 0 || deliveryAddress === '' || deliveryPhone === '' || !selectedPaymentRadio) {
                     if (addressWarn && deliveryAddress === '') addressWarn.classList.remove('hidden');
+                    if (phoneWarn && deliveryPhone === '') phoneWarn.classList.remove('hidden'); // ★★★ MOSTRA AVISO DO TELEFONE ★★★
                     showToast("Preencha todos os campos obrigatórios.", 'error'); return;
                 }
                 if(addressWarn) addressWarn.classList.add('hidden');
+                if(phoneWarn) phoneWarn.classList.add('hidden'); // ★★★ ESCONDE AVISO DO TELEFONE ★★★
                 
                 const selectedPaymentValue = selectedPaymentRadio.value;
                 const finalSubtotal = cartData.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 0), 0);
@@ -585,10 +652,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     orderDetailsId = addressData.id;
 
-                    // B. Salva a Preferência de Pagamento
+                    // B. Salva a Preferência de Pagamento E TELEFONE
                     const { error: prefError } = await supabaseClient
                         .from('Perfis')
-                        .update({ pref_pagamento: selectedPaymentValue })
+                        .update({ 
+                            pref_pagamento: selectedPaymentValue,
+                            telefone: deliveryPhone // ★★★ ATUALIZA O TELEFONE ★★★
+                        })
                         .eq('id', user.id);
 
                     if (prefError) {
@@ -711,7 +781,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Garante que o status não tenha espaços para a classe CSS funcionar
                 const statusClass = pedido.status ? pedido.status.replace(/\s/g, '') : 'Recebido'; 
                 
-                const dataFormatada = new Date(pedido.data_pedido).toLocaleDateString('pt-BR', { dateStyle: 'medium', timeStyle: 'short' });
+                // ★★★ LINHA CORRIGIDA PARA EVITAR O CRASH ★★★
+                const dataFormatada = new Date(pedido.data_pedido).toLocaleString('pt-BR');
                 
                 // Renderiza a lista de itens comprados
                 const itensList = (pedido.detalhes_itens || [])
@@ -753,4 +824,200 @@ document.addEventListener('DOMContentLoaded', () => {
 
         carregarPedidos();
     }
+    
+    // 6. LÓGICA DA PÁGINA "ADMIN" (admin.html) - ADICIONADO
+    
+    if (document.URL.includes("admin.html")) {
+        const adminPedidosList = document.getElementById('admin-pedidos-list');
+        const adminLoading = document.getElementById('admin-loading');
+        const adminLogoutBtn = document.getElementById('admin-logout-btn');
+        
+        // Botão de Logout
+        if (adminLogoutBtn) {
+            adminLogoutBtn.addEventListener('click', async () => {
+                if (supabaseClient) {
+                    const { error } = await supabaseClient.auth.signOut();
+                    if (error) {
+                        showToast("Erro ao sair.", 'error');
+                    } else {
+                        showToast("Sessão encerrada.");
+                        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+                    }
+                }
+            });
+        }
+        
+        // Função para atualizar o status no Supabase
+        async function atualizarStatusPedido(orderId, newStatus) {
+            if (!supabaseClient) return;
+
+            const { error } = await supabaseClient
+                .from('pedidos_v2')
+                .update({ status: newStatus })
+                .eq('id', orderId);
+
+            if (error) {
+                showToast(`Erro ao atualizar pedido #${orderId}: ${error.message}`, 'error');
+            } else {
+                showToast(`Pedido #${orderId} atualizado para "${newStatus}"!`);
+            }
+        }
+
+        // Função para carregar e exibir os pedidos
+        async function carregarPedidosAdmin() {
+            if (!adminPedidosList || !supabaseClient) return;
+            
+            // ★★★ BUSCA O TELEFONE JUNTO COM O PERFIL ★★★
+            const { data: pedidos, error } = await supabaseClient
+                .from('pedidos_v2')
+                .select(`
+                    id, 
+                    data_pedido, 
+                    valor_total, 
+                    status, 
+                    detalhes_itens,
+                    enderecos!left (endereco_completo, observacoes),
+                    user_id:Perfis!left (nome_usuario, telefone) 
+                `)
+                .order('data_pedido', { ascending: false }); // Mais novos primeiro
+
+            if (adminLoading) adminLoading.style.display = 'none'; // Esconde o loading
+
+            if (error) {
+                console.error("Erro ao buscar pedidos (Admin):", error);
+                adminPedidosList.innerHTML = `<p class="text-red-500 font-bold">Erro ao carregar pedidos: ${error.message}</p>`;
+                return;
+            }
+
+            if (pedidos.length === 0) {
+                adminPedidosList.innerHTML = '<p class="text-center text-gray-700 font-medium pt-4">Nenhum pedido recebido ainda.</p>';
+                return;
+            }
+
+            adminPedidosList.innerHTML = ''; // Limpa a lista para popular
+
+            pedidos.forEach(pedido => {
+                const statusClass = pedido.status ? pedido.status.replace(/\s/g, '') : 'Recebido'; 
+                
+                // ★★★ LINHA CORRIGIDA PARA EVITAR O CRASH ★★★
+                const dataFormatada = new Date(pedido.data_pedido).toLocaleString('pt-BR');
+                
+                // Itens
+                const itensList = (pedido.detalhes_itens || [])
+                    .map(item => `<li class="ml-5">${item.quantity}x ${item.name} (${formatCurrency(item.price)})</li>`)
+                    .join('');
+                
+                // ★★★ CAPTURA OS DADOS REAIS (CLIENTE E TELEFONE) ★★★
+                const endereco = (pedido.enderecos && pedido.enderecos.endereco_completo) ? pedido.enderecos.endereco_completo : 'Endereço não encontrado.';
+                const cliente = (pedido.user_id && pedido.user_id.nome_usuario) ? pedido.user_id.nome_usuario : 'Cliente não encontrado.';
+                const telefone = (pedido.user_id && pedido.user_id.telefone) ? pedido.user_id.telefone : 'Não informado.';
+                // ★★★ FIM DA MODIFICAÇÃO ★★★
+
+                const pedidoCard = document.createElement('div');
+                pedidoCard.classList.add('bg-white', 'p-6', 'rounded-lg', 'shadow-lg', 'border-l-4');
+                // Muda a cor da borda baseado no status
+                if (statusClass === 'Recebido') pedidoCard.classList.add('border-yellow-500');
+                else if (statusClass === 'Preparando') pedidoCard.classList.add('border-blue-500');
+                else if (statusClass === 'Entregue') pedidoCard.classList.add('border-green-500');
+                else pedidoCard.classList.add('border-red-500');
+                
+                // ★★★ ATUALIZA O HTML DO CARD PARA INCLUIR O TELEFONE ★★★
+                pedidoCard.innerHTML = `
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-[#b96d5c]">Pedido #${pedido.id}</h3>
+                            <p class="text-sm text-gray-500">Recebido em: ${dataFormatada}</p>
+                        </div>
+                        <div class="text-left sm:text-right mt-2 sm:mt-0">
+                            <p class="font-bold text-2xl text-[#014926]">${formatCurrency(pedido.valor_total)}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 border-t pt-4">
+                        <div>
+                            <p class="font-semibold text-gray-800">Cliente:</p>
+                            <p class="text-gray-600">${cliente}</p>
+                            
+                            <p class="font-semibold text-gray-800 mt-3">Telefone (WhatsApp):</p>
+                            <p class="text-green-700 font-bold">${telefone}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p class="font-semibold text-gray-800">Endereço de Entrega:</p>
+                            <p class="text-gray-600">${endereco}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="font-semibold text-gray-800">Itens:</p>
+                        <ul class="list-disc text-gray-600 text-sm mt-1 space-y-1">
+                            ${itensList}
+                        </ul>
+                    </div>
+                    
+                    <div class="text-right pt-4 border-t border-gray-200">
+                        <label for="status-${pedido.id}" class="font-bold text-gray-700 mr-2 text-sm sm:text-base">Mudar Status:</label>
+                        <select id="status-${pedido.id}" class="admin-status-select status-${statusClass}" data-order-id="${pedido.id}">
+                            <option value="Recebido" ${pedido.status === 'Recebido' ? 'selected' : ''}>Recebido</option>
+                            <option value="Preparando" ${pedido.status === 'Preparando' ? 'selected' : ''}>Preparando</option>
+                            <option value="Entregue" ${pedido.status === 'Entregue' ? 'selected' : ''}>Entregue</option>
+                            <option value="Cancelado" ${pedido.status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+                        </select>
+                    </div>
+                `;
+                adminPedidosList.appendChild(pedidoCard);
+            });
+        }
+        
+        // Adiciona o 'listener' para os seletores de status
+        adminPedidosList.addEventListener('change', (event) => {
+            if (event.target.classList.contains('admin-status-select')) {
+                const orderId = event.target.dataset.orderId;
+                const newStatus = event.target.value;
+                
+                // Remove classes de status antigas e adiciona a nova
+                event.target.classList.remove('status-Recebido', 'status-Preparando', 'status-Entregue', 'status-Cancelado');
+                event.target.classList.add(`status-${newStatus.replace(/\s/g, '')}`);
+                
+                // Atualiza a borda do card pai
+                const card = event.target.closest('.bg-white');
+                card.classList.remove('border-yellow-500', 'border-blue-500', 'border-green-500', 'border-red-500');
+                if (newStatus === 'Recebido') card.classList.add('border-yellow-500');
+                else if (newStatus === 'Preparando') card.classList.add('border-blue-500');
+                else if (newStatus === 'Entregue') card.classList.add('border-green-500');
+                else card.classList.add('border-red-500');
+                
+                atualizarStatusPedido(orderId, newStatus);
+            }
+        });
+
+        // GATEKEEPER: Verifica se o usuário é admin antes de carregar
+        async function checkAdminAccess() {
+            if (!supabaseClient) {
+                showToast("Falha na conexão com o banco.", 'error');
+                return;
+            }
+
+            const { data: { user } } = await supabaseClient.auth.getUser();
+
+            if (!user) {
+                // Não está logado, chuta para o login
+                showToast("Acesso restrito. Por favor, faça login.", 'error');
+                setTimeout(() => { window.location.href = 'login.html?redirect=admin.html'; }, 1000);
+                return;
+            }
+
+            if (user.email !== ADMIN_EMAIL) {
+                // Logado, mas não é o admin, chuta para o index
+                showToast("Você não tem permissão para acessar esta página.", 'error');
+                setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+                return;
+            }
+
+            // Se chegou aqui, é o admin. Carrega os pedidos.
+            carregarPedidosAdmin();
+        }
+        
+        checkAdminAccess(); // Roda a verificação de segurança ao carregar a página
+    }
+    
 });

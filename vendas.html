@@ -39,9 +39,21 @@
 
                 <section class="mb-8">
                     <h3 class="text-2xl font-semibold text-[#b96d5c] mb-5 pb-2 border-b border-gray-200 flex items-center">
-                        <i class="fas fa-map-marked-alt mr-3"></i> 1. Endereço de Entrega
+                        <i class="fas fa-map-marked-alt mr-3"></i> 1. Contato e Entrega
                     </h3>
                     <form id="delivery-form" class="space-y-4">
+                        
+                        <div>
+                            <label for="phone-input" class="block text-base font-medium text-gray-800 mb-1">Telefone (WhatsApp)*</label>
+                            <input
+                                type="tel"
+                                id="phone-input"
+                                placeholder="(XX) XXXXX-XXXX"
+                                class="w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-[#b96d5c]/30 transition duration-200 shadow-sm"
+                                required
+                            >
+                            <p class="text-red-600 text-sm mt-1 hidden font-medium" id="phone-warn">* Por favor, informe seu telefone.</p>
+                        </div>
                         <div>
                             <label for="address-input" class="block text-base font-medium text-gray-800 mb-1">Endereço Completo*</label>
                             <input

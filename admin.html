@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Pedidos Recebidos - BitCake</title>
+
+    <link rel="shortcut icon" href="./assets/logo.png" type="image/x-icon">
+    
+    <link rel="stylesheet" href="./styles/output.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* Estilos de Status (Copiados de meus_pedidos.html) */
+        .status-badge {
+            display: inline-block; padding: 4px 8px; border-radius: 9999px;
+            font-size: 0.75rem; line-height: 1; font-weight: bold;
+        }
+        .status-Recebido { background-color: #ffecc4; color: #d97706; }
+        .status-Preparando { background-color: #bfdbfe; color: #1e40af; }
+        .status-Entregue { background-color: #d1fae5; color: #065f46; }
+        .status-Cancelado { background-color: #fecaca; color: #b91c1c; }
+
+        /* Estilo para o seletor de status */
+        .admin-status-select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 2px solid #ddd;
+            font-weight: 500;
+            transition: border-color 0.2s;
+        }
+        .admin-status-select:focus {
+            outline: none;
+            border-color: #b96d5c;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        
+        <div class="flex justify-between items-center mb-10 border-b pb-4">
+            <h1 class="text-3xl font-extrabold text-[#014926] flex items-center">
+                <i class="fas fa-shield-alt mr-3 text-[#b96d5c]"></i> Painel da Cozinha
+            </h1>
+            
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="text-gray-600 hover:text-[#b96d5c] font-medium transition-colors duration-200 flex items-center">
+                    <i class="fas fa-home mr-2"></i> Ver Loja
+                </a>
+                <button 
+                    id="admin-logout-btn" 
+                    class="bg-red-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-red-700 transition-colors duration-200 shadow-md"
+                >
+                    <i class="fas fa-sign-out-alt mr-1"></i> Sair
+                </button>
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-bold text-zinc-800 mb-6">Pedidos Recebidos (Novos primeiro)</h2>
+
+        <div id="admin-pedidos-list" class="space-y-6">
+            
+            <div id="admin-loading" class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                <p class="text-center text-gray-500 font-medium">
+                    <i class="fas fa-spinner fa-spin mr-2"></i> Carregando novos pedidos...
+                </p>
+            </div>
+
+            </div>
+
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
+    <script src="script.js" defer></script>
+</body>
+</html>
