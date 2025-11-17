@@ -41,6 +41,11 @@
                     <h3 class="text-2xl font-semibold text-[#b96d5c] mb-5 pb-2 border-b border-gray-200 flex items-center">
                         <i class="fas fa-map-marked-alt mr-3"></i> 1. Contato e Entrega
                     </h3>
+
+                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-5 rounded-md" role="alert">
+                        <p class="font-bold"><i class="fas fa-exclamation-triangle mr-2"></i>Atenção</p>
+                        <p>No momento, realizamos entregas apenas para a cidade de <strong>Cataguases - MG</strong>.</p>
+                    </div>
                     <form id="delivery-form" class="space-y-4">
                         
                         <div>
@@ -54,17 +59,19 @@
                             >
                             <p class="text-red-600 text-sm mt-1 hidden font-medium" id="phone-warn">* Por favor, informe seu telefone.</p>
                         </div>
+                        
                         <div>
                             <label for="address-input" class="block text-base font-medium text-gray-800 mb-1">Endereço Completo*</label>
                             <input
                                 type="text"
                                 id="address-input"
-                                placeholder="Ex: Rua das Flores, 123, Centro"
+                                placeholder="Ex: Rua das Flores, 123, Centro, Cataguases"
                                 class="w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-[#b96d5c]/30 transition duration-200 shadow-sm"
                                 required
                             >
                             <p class="text-red-600 text-sm mt-1 hidden font-medium" id="address-warn">* Por favor, informe seu endereço completo.</p>
-                        </div>
+                            <p class="text-red-600 text-sm mt-1 hidden font-medium" id="address-city-warn">* Infelizmente, só entregamos na cidade de Cataguases.</p>
+                            </div>
                         <div>
                             <label for="notes-input" class="block text-base font-medium text-gray-800 mb-1">Observações (Opcional)</label>
                             <textarea

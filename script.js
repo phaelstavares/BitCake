@@ -1,5 +1,5 @@
 const SUPABASE_URL = 'https://wvithsajytvhsazxmgaj.supabase.co'; 
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2aXRoc2FqeXR2aHNhenhtZ2FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNTQ1MTgsImV4cCI6MjA3NjczMDUxOH0.gIFxHbvUBfrrWffRSNjaW4CCtykqOQoeiL4l7WQpsjA';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2aXRoc2FqeXR2aHNhenhtZ2FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNTQ1MTgsImV4cCI6MjA3NjczMDUxOH0.gIFxHbvUBfrrWffRSNjaW4CCtykqOQoeiL4l7WQpsjA'; 
 
 const ADMIN_EMAIL = 'admincake@gmail.com';
 
@@ -12,7 +12,7 @@ if (typeof supabase !== 'undefined') {
 }
 
 let cart = [];
-const DELIVERY_FEE = 10.00; 
+const DELIVERY_FEE = 5.00; 
 
 function showToast(message, type = 'success') {
     if (typeof Toastify !== 'function') return; 
@@ -474,6 +474,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const phoneWarn = document.getElementById('phone-warn');
         const addressInput = document.getElementById('address-input');
         const addressWarn = document.getElementById('address-warn');
+        // ★★★ NOVO AVISO DE CIDADE ★★★
+        const addressCityWarn = document.getElementById('address-city-warn');
         // ★★★ FIM DA MODIFICAÇÃO ★★★
         const paymentOptionsElements = document.querySelectorAll('input[name="payment-method"]');
         const detailsCartao = document.getElementById('details-cartao');
@@ -605,19 +607,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Validações
                 const cartData = getCartFromStorage();
-                // ★★★ VALIDA O TELEFONE ★★★
                 const deliveryPhone = phoneInput ? phoneInput.value.trim() : '';
                 const deliveryAddress = addressInput ? addressInput.value.trim() : '';
                 const notes = document.getElementById('notes-input')?.value;
                 const selectedPaymentRadio = document.querySelector('input[name="payment-method"]:checked');
 
+                // ★★★ INÍCIO DO BLOCO DE VALIDAÇÃO MODIFICADO ★★★
+                // 1. Reseta todos os avisos
+                if(addressWarn) addressWarn.classList.add('hidden');
+                if(phoneWarn) phoneWarn.classList.add('hidden');
+                if(addressCityWarn) addressCityWarn.classList.add('hidden');
+
+                // 2. Valida campos vazios
                 if (cartData.length === 0 || deliveryAddress === '' || deliveryPhone === '' || !selectedPaymentRadio) {
                     if (addressWarn && deliveryAddress === '') addressWarn.classList.remove('hidden');
-                    if (phoneWarn && deliveryPhone === '') phoneWarn.classList.remove('hidden'); // ★★★ MOSTRA AVISO DO TELEFONE ★★★
-                    showToast("Preencha todos os campos obrigatórios.", 'error'); return;
+                    if (phoneWarn && deliveryPhone === '') phoneWarn.classList.remove('hidden'); 
+                    showToast("Preencha todos os campos obrigatórios.", 'error'); 
+                    return;
                 }
-                if(addressWarn) addressWarn.classList.add('hidden');
-                if(phoneWarn) phoneWarn.classList.add('hidden'); // ★★★ ESCONDE AVISO DO TELEFONE ★★★
+                
+                // 3. Valida a cidade (convertendo para minúsculas)
+                const targetCity = "cataguases";
+                if (!deliveryAddress.toLowerCase().includes(targetCity)) {
+                    if (addressCityWarn) addressCityWarn.classList.remove('hidden'); // Mostra o aviso da cidade
+                    showToast("Endereço fora da área de entrega.", 'error');
+                    return; // Para a execução
+                }
+                // ★★★ FIM DO BLOCO DE VALIDAÇÃO ★★★
                 
                 const selectedPaymentValue = selectedPaymentRadio.value;
                 const finalSubtotal = cartData.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 0), 0);
